@@ -1,6 +1,7 @@
-# Tmux cpu status
+# Tmux CPU and GPU status
 
-Enables displaying cpu percentage and status icon in Tmux status-right.
+Enables displaying CPU and GPU information in Tmux `status-right` and `status-left`.
+Configurable percentage and icon display.
 
 ## Installation
 ### Installation with [Tmux Plugin Manager](https://github.com/tmux-plugins/tpm) (recommended)
@@ -32,21 +33,39 @@ If format strings are added to `status-right`, they should now be visible.
 
 ### Optional requirement (Linux, BSD, OSX)
 
-`iostat` or `sar` are the best way to get an accurate cpu percentage
-
+`iostat` or `sar` are the best way to get an accurate CPU percentage.
 A fallback is included using `ps -aux` but could be inaccurate.
+`nvidia-smi` is required for GPU information.
+For OSX, `cuda-smi` is required instead (but only shows GPU memory use rather
+than load).
 
 ## Usage
 
-Add `#{cpu_icon}`, `#{cpu_percentage}` `#{cpu_fg_color}`, or
-`#{cpu_bg_color}` format strings to existing `status-right` tmux option.
+Add any of the supported format strings (see below) to the existing `status-right` tmux option.
 Example:
 
     # in .tmux.conf
     set -g status-right '#{cpu_bg_color} CPU: #{cpu_icon} #{cpu_percentage} | %a %h-%d %H:%M '
 
+### Supported Options
+
+This is done by introducing 8 new format strings that can be added to
+`status-right` option:
+
+ - `#{cpu_icon}` - will display a CPU status icon
+ - `#{cpu_percentage}` - will show CPU percentage (averaged across cores)
+ - `#{cpu_bg_color}` - will change the background color based on the CPU percentage
+ - `#{cpu_fg_color}` - will change the foreground color based on the CPU percentage
+
+GPU equivalents also exist:
+
+ - `#{gpu_icon}` - will display a GPU status icon
+ - `#{gpu_percentage}` - will show GPU percentage (averaged across devices)
+ - `#{gpu_bg_color}` - will change the background color based on the GPU percentage
+ - `#{gpu_fg_color}` - will change the foreground color based on the GPU percentage
 
 ## Examples
+
 CPU usage lower than 30%:<br/>
 ![low_fg](/screenshots/low_fg.png)
 ![low_bg](/screenshots/low_bg.png)
@@ -62,45 +81,36 @@ CPU usage higher than 80%:<br/>
 ![high_bg](/screenshots/high_bg.png)
 ![high_icon](/screenshots/high_icon.png)
 
-This is done by introducing 4 new format strings that can be added to
-`status-right` option:
-- `#{cpu_icon}` - will display a cpu status icon
-- `#{cpu_percentage}` - will show cpu percentage
-- `#{cpu_bg_color}` - will set the background color of the status bar based on the cpu percentage
-- `#{cpu_fg_color}` - will set the foreground color of the status bar based on the cpu percentage
+## Customization
 
-## Changing default
+Here are all available options with their default values:
 
-By default, these icons are displayed:
+```shell
+@cpu_low_icon "=" # icon when cpu is low
+@cpu_medium_icon "≡" # icon when cpu is medium
+@cpu_high_icon "≣" # icon when cpu is high
 
- - low: "="
- - medium: "≡"
- - high: "≣"
+@cpu_low_fg_color "" # foreground color when cpu is low
+@cpu_medium_fg_color "" # foreground color when cpu is medium
+@cpu_high_fg_color "" # foreground color when cpu is high
 
-And these colors are used:
+@cpu_low_bg_color "#[bg=green]" # background color when cpu is low
+@cpu_medium_bg_color "#[bg=yellow]" # background color when cpu is medium
+@cpu_high_bg_color "#[bg=red]" # background color when cpu is high
 
- - low: `#[fg=green]` `#[bg=green]`
- - medium: `#[fg=yellow]` `#[bg=yellow]`
- - high: `#[fg=red]` `#[bg=red]`
+@cpu_percentage_format "%3.1f%%" # printf format to use to display percentage
+```
+
+Same options are valid with `@gpu`
 
 Note that these colors depend on your terminal / X11 config.
 
-You can change these defaults by adding the following to `.tmux.conf`:
+You can can customize each one of these options in your `.tmux.conf`, for example:
 
-```
-set -g @cpu_low_icon "ᚋ"
-set -g @cpu_medium_icon "ᚌ"
-set -g @cpu_high_icon "ᚍ"
-
+```shell
 set -g @cpu_low_fg_color "#[fg=#00ff00]"
-set -g @cpu_medium_fg_color "#[fg=#ffff00]"
-set -g @cpu_high_fg_color "#[fg=#ff0000]"
-
-set -g @cpu_low_bg_color "#[bg=#00ff00]"
-set -g @cpu_medium_bg_color "#[bg=#ffff00]"
-set -g @cpu_high_bg_color "#[bg=#ff0000]"
+set -g @cpu_percentage_format "%5.1f%%" # Add left padding
 ```
-
 
 Don't forget to reload tmux environment (`$ tmux source-file ~/.tmux.conf`)
 after you do this.
@@ -109,9 +119,6 @@ after you do this.
 
 This plugin is part of the [tmux-plugins](https://github.com/tmux-plugins) organisation. Checkout plugins as [battery](https://github.com/tmux-plugins/tmux-battery), [logging](https://github.com/tmux-plugins/tmux-logging), [online status](https://github.com/tmux-plugins/tmux-online-status), and many more over at the [tmux-plugins](https://github.com/tmux-plugins) organisation page.
 
-You might want to follow [@brunosutic](https://twitter.com/brunosutic) on
-twitter if you want to hear about new tmux plugins or feature updates.
-
 ### Maintainer
 
  - [Camille Tjhoa](https://github.com/ctjhoa)
@@ -119,4 +126,3 @@ twitter if you want to hear about new tmux plugins or feature updates.
 ### License
 
 [MIT](LICENSE.md)
-

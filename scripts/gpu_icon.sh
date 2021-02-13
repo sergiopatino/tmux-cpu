@@ -22,7 +22,7 @@ get_icon_settings() {
 
 print_icon() {
   local gpu_percentage=$($CURRENT_DIR/gpu_percentage.sh | sed -e 's/%//')
-  local gpu_load_status=$(cpu_load_status $gpu_percentage)
+  local gpu_load_status=$(load_status $gpu_percentage)
   if [ $gpu_load_status == "low" ]; then
     echo "$gpu_low_icon"
   elif [ $gpu_load_status == "medium" ]; then
@@ -34,7 +34,6 @@ print_icon() {
 
 main() {
   get_icon_settings
-  local gpu_icon=$(print_icon "$1")
-  echo "$gpu_icon"
+  print_icon "$1"
 }
 main

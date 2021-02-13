@@ -10,17 +10,14 @@ print_gpu_percentage() {
   gpu_percentage_format=$(get_tmux_option "@gpu_percentage_format" "$gpu_percentage_format")
 
   if command_exists "nvidia-smi"; then
-    loads=$(nvidia-smi)
+    loads=$(cached_eval nvidia-smi)
   elif command_exists "cuda-smi"; then
-    loads=$(cuda-smi)
+    loads=$(cached_eval cuda-smi)
   else
-    echo "nvidia-smi/cuda-smi not found"
+    echo "No GPU"
     return
   fi
-  loads=$(echo "$loads" | sed -nr 's/.*\s([0-9]+)%.*/\1/p')
-  gpus=$(echo "$loads" | wc -l)
-  load=$(echo "$loads" | awk '{count+=$1} END {print count}')
-  echo "$load $gpus" | awk -v format="$gpu_percentage_format" '{printf format, $1/$2}'
+  echo "$loads" | sed -nr 's/.*\s([0-9]+)%.*/\1/p' | awk -v format="$gpu_percentage_format" '{sum+=$1; n+=1} END {printf format, sum/n}'
 }
 
 main() {
